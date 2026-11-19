@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Café Équilibre</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Prata&display=swap">
+<style>:root{color-scheme:light}body{margin:0}</style>
+<style>
+/* Concept: a Paris café carte. Zinc-roof slate for text, Guimard metro green as the one accent,
+   limestone ground, a scalloped striped awning on top, iron balcony rules between sections,
+   dotted leaders on the menu like a printed carte. */
+:root{
+  --bg:#ECEEEB; --surface:#F7F8F6; --ink:#1C2830; --ink-soft:#52626C;
+  --line:#CDD4D1; --line-strong:#7D8B8A; --track:#DBE1DE;
+  --green:#1F5A47; --on-green:#F5F8F6; --red:#A63A49; --awn2:#F7F8F6;
+  --display:"Prata","Georgia","Times New Roman",serif;
+  --body:"Jost","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11191E; --surface:#192329; --ink:#E6ECE9; --ink-soft:#9DAEB6;
+    --line:#2B3941; --line-strong:#5C6E77; --track:#26333A;
+    --green:#58AD8D; --on-green:#0C1713; --red:#E27F8D; --awn2:#222E35;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11191E; --surface:#192329; --ink:#E6ECE9; --ink-soft:#9DAEB6;
+  --line:#2B3941; --line-strong:#5C6E77; --track:#26333A;
+  --green:#58AD8D; --on-green:#0C1713; --red:#E27F8D; --awn2:#222E35;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body)}
+h1,h2,h3,p,ul,dl,dd,fieldset{margin:0;padding:0}
+ul{list-style:none}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+.awning{
+  height:40px;
+  background:repeating-linear-gradient(90deg,var(--green) 0 28px,var(--awn2) 28px 56px);
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 14px) no-repeat,
+    radial-gradient(circle at 14px 0,#000 13.5px,transparent 14px) bottom/28px 14px repeat-x;
+  mask:linear-gradient(#000 0 0) top/100% calc(100% - 14px) no-repeat,
+    radial-gradient(circle at 14px 0,#000 13.5px,transparent 14px) bottom/28px 14px repeat-x;
+}
+.wrap{
+  max-width:1120px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:20px 56px;
+}
+.masthead{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end}
+.masthead > div{min-width:0}
+.tower{height:150px;width:auto;color:var(--ink-soft);display:block}
+h1{font:400 clamp(2.6rem,10vw,4.8rem)/1 var(--display);letter-spacing:-.01em;text-wrap:balance;margin:6px 0 14px}
+.lede{max-width:34rem;color:var(--ink-soft);font-size:1.05rem}
+.eyebrow{font:500 .72rem/1.3 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+.iron{display:block;width:100%;height:16px;margin:30px 0}
+.ip{stroke:var(--line-strong);fill:none;stroke-width:1.2}
+
+.sec{display:block}
+h2{font:400 clamp(1.7rem,5vw,2.3rem)/1.15 var(--display);text-wrap:balance;margin:6px 0 18px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 20px}
+.sec-head > div{min-width:0}
+.cols{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+@media (min-width:880px){.cols{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);padding:20px}
+
+fieldset{border:0;min-width:0}
+.lbl,label,legend{display:block;font:500 .74rem/1.3 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;padding:0}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+.fields > *{min-width:0}
+.span-all{grid-column:1/-1}
+input[type=number],input[type=text],select{
+  width:100%;min-height:44px;padding:9px 12px;font:400 1rem/1.3 var(--body);color:var(--ink);
+  background:var(--bg);border:1px solid var(--line-strong);border-radius:2px;
+}
+.seg{position:relative;display:flex;border:1px solid var(--line-strong);border-radius:2px;overflow:hidden;min-height:44px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{flex:1;margin:0;display:flex;align-items:center;justify-content:center;padding:8px 10px;cursor:pointer;
+  text-transform:none;letter-spacing:0;font:400 .95rem/1.2 var(--body);color:var(--ink);background:var(--bg)}
+.seg label + input + label{border-left:1px solid var(--line-strong)}
+.seg input:checked + label{background:var(--green);color:var(--on-green)}
+.seg input:focus-visible + label{outline:2px solid var(--ink);outline-offset:-4px}
+
+.btn{font:500 .8rem/1 var(--body);letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:0 20px;
+  border-radius:2px;border:1px solid var(--green);background:var(--green);color:var(--on-green);cursor:pointer}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--green)}
+.btn.warn{border-color:var(--red);color:var(--red)}
+.note{font-size:.9rem;color:var(--ink-soft)}
+.note.err{color:var(--red)}
+
+.ticket{display:flex;flex-direction:column;gap:14px}
+.big{font:400 clamp(3rem,9vw,4.2rem)/1 var(--display);color:var(--green);font-variant-numeric:tabular-nums}
+.big small{font:500 .8rem var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-left:8px}
+.macros{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0}
+.macros dt{font:500 .7rem/1.3 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.macros dd{font:400 1.5rem/1.2 var(--display);font-variant-numeric:tabular-nums}
+.macros dd small{font:400 .8rem var(--body);color:var(--ink-soft)}
+.facts{display:flex;flex-direction:column;gap:4px;font-size:.92rem;color:var(--ink-soft)}
+.facts b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+
+.add-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;align-items:end}
+.add-row > *{min-width:0}
+.add-row .wide{grid-column:1/-1}
+.status{min-height:1.4em}
+.group{margin-top:22px}
+.group h3{font:500 .74rem/1.3 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:2px 2px 2px 12px;border:1px solid var(--line-strong);border-radius:2px;background:var(--surface)}
+.chip .nm{overflow-wrap:anywhere}
+.chip .k{font-size:.8rem;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums}
+.x{width:34px;height:34px;border:0;background:transparent;color:var(--ink-soft);font:400 1.3rem/1 var(--body);cursor:pointer;border-radius:2px;flex:none}
+.x:hover{color:var(--red)}
+.quick{margin-top:16px}
+.quick .chip{padding:0;cursor:pointer;color:var(--green);font:inherit}
+.quick button.chip{padding:8px 12px;font-size:.92rem}
+.quick button.chip:hover{border-color:var(--green)}
+.banner{border:1px dashed var(--line-strong);padding:10px 14px;margin-bottom:16px;font-size:.92rem;color:var(--ink-soft)}
+.empty{padding:20px;border:1px dashed var(--line-strong);color:var(--ink-soft)}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:22px}
+
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.meal{background:var(--surface);border:1px solid var(--line);padding:18px 18px 14px;min-width:0}
+.meal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.meal-head > div{min-width:0}
+.meal h3{font:400 1.5rem/1.15 var(--display)}
+.when{font-size:.85rem;color:var(--ink-soft)}
+.mk{font:400 1.5rem/1.1 var(--display);color:var(--green);white-space:nowrap;font-variant-numeric:tabular-nums}
+.mk small{display:block;font:500 .66rem var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:right}
+.dishes li{display:flex;align-items:flex-end;gap:8px;padding:6px 0}
+.dishes .nm{min-width:0;overflow-wrap:anywhere}
+.dots{flex:1 1 14px;min-width:14px;border-bottom:2px dotted var(--line-strong);margin-bottom:.4em}
+.gr{white-space:nowrap;font-weight:500;font-variant-numeric:tabular-nums}
+.kc{width:4.6rem;text-align:right;white-space:nowrap;font-size:.85rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.addition{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-top:4px double var(--line-strong);padding:20px}
+.addition h3{font:400 1.6rem/1.2 var(--display);margin:4px 0 14px}
+.rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:16px 28px}
+.row .top{display:flex;justify-content:space-between;gap:10px;font-size:.92rem;margin-bottom:6px}
+.row .top span:last-child{font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.bar{height:6px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green)}
+.bar i.over{background:var(--red)}
+.verdict{margin-top:16px;font-weight:500}
+.notes{margin-top:8px;display:flex;flex-direction:column;gap:4px;color:var(--ink-soft);font-size:.92rem}
+.foot{margin-top:8px;font-size:.85rem;color:var(--ink-soft);max-width:44rem}
+@media (max-width:520px){.tower{height:104px}.kc{width:4rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="ironPat" width="32" height="16" patternUnits="userSpaceOnUse">
+      <path class="ip" d="M0 15H32"/>
+      <path class="ip" d="M2 15C2 6 14 6 14 11"/>
+      <path class="ip" d="M30 15C30 6 18 6 18 11"/>
+      <circle class="ip" cx="16" cy="5" r="2.6"/>
+      <path class="ip" d="M16 8V15"/>
+    </pattern>
+  </defs>
+</svg>
+
+<div class="awning" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Paris · правильное питание</p>
+      <h1>Café Équilibre</h1>
+      <p class="lede">Введите рост и вес, добавьте продукты, которые есть дома, и получите меню на день с граммами и калориями.</p>
+    </div>
+    <svg class="tower" viewBox="0 0 120 220" role="img" aria-label="Эйфелева башня, линейный рисунок" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M60 2V22"/>
+      <path d="M58 22L52 70M62 22L68 70"/>
+      <path d="M55 46H65M57 30L64 46M63 30L56 46"/>
+      <path d="M46 70H74M45 74H75"/>
+      <path d="M52 74L44 120M68 74L76 120"/>
+      <path d="M49 96H71M51 80L71 96M69 80L49 96"/>
+      <path d="M34 120H86M32 125H88"/>
+      <path d="M40 125C34 160 24 190 12 212M80 125C86 160 96 190 108 212"/>
+      <path d="M47 125C43 160 37 190 30 212M73 125C77 160 83 190 90 212"/>
+      <path d="M46 135H74M30 212C36 166 84 166 90 212"/>
+      <path d="M8 212H34M86 212H112"/>
+    </svg>
+  </header>
+
+  <svg class="iron" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#ironPat)"/></svg>
+
+  <section class="sec" id="profile" aria-labelledby="h-profile">
+    <p class="eyebrow">I · Vous</p>
+    <h2 id="h-profile">Ваши параметры</h2>
+    <div class="cols">
+      <form class="panel" id="profileForm" autocomplete="off">
+        <div class="fields">
+          <fieldset>
+            <legend>Пол</legend>
+            <div class="seg">
+              <input type="radio" name="sex" id="sexF" value="f"><label for="sexF">Женщина</label>
+              <input type="radio" name="sex" id="sexM" value="m"><label for="sexM">Мужчина</label>
+            </div>
+          </fieldset>
+          <div>
+            <label for="age">Возраст, лет</label>
+            <input type="number" id="age" inputmode="decimal" step="any" min="18" max="90">
+          </div>
+          <div>
+            <label for="height">Рост, см</label>
+            <input type="number" id="height" inputmode="decimal" step="any" min="120" max="230">
+          </div>
+          <div>
+            <label for="weight">Вес, кг</label>
+            <input type="number" id="weight" inputmode="decimal" step="any" min="30" max="250">
+          </div>
+          <div class="span-all">
+            <label for="activity">Активность</label>
+            <select id="activity">
+              <option value="1.2">Сидячий образ жизни</option>
+              <option value="1.375">Лёгкая: 1–3 тренировки в неделю</option>
+              <option value="1.55">Умеренная: 3–5 тренировок в неделю</option>
+              <option value="1.725">Высокая: 6–7 тренировок в неделю</option>
+            </select>
+          </div>
+          <div>
+            <label for="goal">Цель</label>
+            <select id="goal">
+              <option value="lose">Снизить вес</option>
+              <option value="keep">Поддерживать вес</option>
+              <option value="gain">Набрать вес</option>
+            </select>
+          </div>
+          <fieldset>
+            <legend>Приёмов пищи</legend>
+            <div class="seg">
+              <input type="radio" name="meals" id="meals3" value="3"><label for="meals3">3</label>
+              <input type="radio" name="meals" id="meals4" value="4"><label for="meals4">4 с перекусом</label>
+            </div>
+          </fieldset>
+        </div>
+        <p class="note" id="pNote" style="margin-top:14px">Подставлены примерные значения. Введите свои.</p>
+      </form>
+
+      <div class="panel ticket" id="normBox" aria-live="polite">
+        <p class="eyebrow">Ваша норма на день</p>
+        <p class="big"><span id="kcalBig">—</span><small>ккал</small></p>
+        <dl class="macros">
+          <div><dt>Белки</dt><dd><span id="mP">—</span> <small>г</small></dd></div>
+          <div><dt>Жиры</dt><dd><span id="mF">—</span> <small>г</small></dd></div>
+          <div><dt>Углеводы</dt><dd><span id="mC">—</span> <small>г</small></dd></div>
+        </dl>
+        <div class="facts">
+          <p>Обмен веществ в покое: <b id="fBmr">—</b></p>
+          <p>С учётом активности: <b id="fTdee">—</b></p>
+          <p>Индекс массы тела: <b id="fBmi">—</b></p>
+        </div>
+        <p class="note" id="normNote" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <svg class="iron" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#ironPat)"/></svg>
+
+  <section class="sec" id="pantry" aria-labelledby="h-pantry">
+    <p class="eyebrow">II · Garde-manger</p>
+    <h2 id="h-pantry">Ваши продукты</h2>
+    <p class="note" style="margin-bottom:16px">Меню собирается только из этих продуктов. Калорийность и белки, жиры, углеводы указаны на 100 г.</p>
+    <div class="banner" id="exampleNote">Это примерный набор. Удалите лишнее и добавьте своё, меню пересоберётся.</div>
+
+    <form class="panel" id="addForm" autocomplete="off">
+      <div class="add-row">
+        <div class="wide">
+          <label for="pName">Название продукта</label>
+          <input type="text" id="pName" list="catalog" maxlength="60" placeholder="Например, индейка или кабачок">
+          <datalist id="catalog"></datalist>
+        </div>
+        <div>
+          <label for="pCat">Категория</label>
+          <select id="pCat"></select>
+        </div>
+        <div>
+          <label for="pKcal">Ккал</label>
+          <input type="number" id="pKcal" inputmode="decimal" step="any" min="0">
+        </div>
+        <div>
+          <label for="pP">Белки, г</label>
+          <input type="number" id="pP" inputmode="decimal" step="any" min="0">
+        </div>
+        <div>
+          <label for="pF">Жиры, г</label>
+          <input type="number" id="pF" inputmode="decimal" step="any" min="0">
+        </div>
+        <div>
+          <label for="pC">Углеводы, г</label>
+          <input type="number" id="pC" inputmode="decimal" step="any" min="0">
+        </div>
+        <div>
+          <button type="submit" class="btn" style="width:100%">Добавить</button>
+        </div>
+      </div>
+      <p class="note status" id="addStatus" role="status" style="margin-top:10px">Начните вводить название: цифры подставятся из каталога.</p>
+    </form>
+
+    <div class="quick" id="quickBox" hidden>
+      <p class="lbl">Быстро добавить</p>
+      <div class="chips" id="quick"></div>
+    </div>
+
+    <div id="pantryList"></div>
+    <div class="tools">
+      <p class="note" id="pantryCount"></p>
+      <button type="button" class="btn ghost" id="clearAll">Очистить список</button>
+    </div>
+  </section>
+
+  <svg class="iron" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#ironPat)"/></svg>
+
+  <section class="sec" id="menu" aria-labelledby="h-menu">
+    <div class="sec-head">
+      <div>
+        <p class="eyebrow">III · La carte du jour</p>
+        <h2 id="h-menu">Меню на день</h2>
+      </div>
+      <button type="button" class="btn" id="reshuffle" style="margin-bottom:18px">Составить другое</button>
+    </div>
+    <p class="note" style="margin-bottom:16px">Мясо, рыбу, крупы и макароны взвешивайте сырыми, как на упаковке. Чем разнообразнее список продуктов, тем больше вариантов меню.</p>
+    <div id="menuOut"></div>
+  </section>
+
+  <p class="foot" style="margin-top:36px">Норма считается по формуле Миффлина–Сан-Жеора. Это ориентир, а не медицинская рекомендация. При болезнях, беременности и кормлении грудью питание согласуйте с врачом.</p>
+</div>
+
+<script id="logic">
+'use strict';
+const CATS=[['meat','Мясо и птица'],['fish','Рыба и морепродукты'],['egg','Яйца'],['dairy','Молочные продукты'],['legume','Бобовые и тофу'],['grain','Крупы, хлеб, гарниры'],['veg','Овощи и грибы'],['fruit','Фрукты и ягоды'],['nut','Орехи'],['oil','Масла'],['other','Прочее']];
+const CAT_LABEL={}; CATS.forEach(c=>{CAT_LABEL[c[0]]=c[1];});
+const PORTION={meat:{base:130,lo:80,hi:220},fish:{base:140,lo:90,hi:230},egg:{base:100,lo:50,hi:200},dairy:{base:150,lo:100,hi:300},legume:{base:60,lo:30,hi:110},grain:{base:70,lo:30,hi:130},veg:{base:150,lo:100,hi:300},fruit:{base:150,lo:100,hi:260},nut:{base:20,lo:10,hi:40},oil:{base:10,lo:5,hi:15},other:{base:15,lo:10,hi:25}};
+/* name, category, kcal, protein, fat, carbs (per 100 g), extras */
+const DB=[
+['Куриная грудка','meat',113,23.6,1.9,0.4],
+['Индейка (филе)','meat',114,23.7,1.5,0],
+['Куриное бедро без кожи','meat',121,19.7,4.1,0],
+['Говядина','meat',187,18.9,12.4,0],
+['Свинина (вырезка)','meat',143,21,6,0],
+['Лосось','fish',208,20,13.6,0],
+['Треска','fish',78,17.7,0.7,0],
+['Минтай','fish',72,15.9,0.9,0],
+['Хек','fish',86,16.6,2.2,0],
+['Креветки','fish',87,18,1.1,0],
+['Тунец в собственном соку','fish',96,21.5,0.9,0],
+['Яйцо куриное','egg',157,12.7,11.5,0.7,{piece:50,base:100,lo:50,hi:200}],
+['Творог 5%','dairy',121,17.2,5,1.8],
+['Творог обезжиренный','dairy',71,16.5,0.2,1.3],
+['Кефир 1%','dairy',40,3,1,4],
+['Кефир 2,5%','dairy',50,2.9,2.5,4],
+['Молоко 2,5%','dairy',52,2.8,2.5,4.7],
+['Йогурт натуральный','dairy',60,4.3,2,6],
+['Греческий йогурт','dairy',73,9,2,4],
+['Сыр твёрдый','dairy',360,24,29,0,{base:30,lo:15,hi:60}],
+['Чечевица','legume',295,24,1.5,46],
+['Фасоль','legume',298,21,2,47],
+['Нут','legume',364,19,6,61],
+['Тофу','legume',76,8,4.8,1.9,{base:150,lo:100,hi:250}],
+['Овсяные хлопья','grain',352,12.3,6.2,61.8,{bf:1}],
+['Гречка','grain',313,12.6,3.3,62.1,{bf:1}],
+['Рис белый','grain',344,6.7,0.7,78.9,{bf:1}],
+['Рис бурый','grain',337,7.4,1.8,72.9,{bf:1}],
+['Пшено','grain',348,11.5,3.3,69.3,{bf:1}],
+['Киноа','grain',368,14.1,6.1,64.2,{bf:1}],
+['Булгур','grain',342,12.3,1.3,75.9],
+['Кускус','grain',376,12.8,0.6,77],
+['Перловка','grain',320,9.3,1.1,66.9],
+['Макароны твёрдых сортов','grain',344,13,1.5,71],
+['Картофель','grain',77,2,0.4,16.3,{piece:120,base:200,lo:120,hi:350}],
+['Батат','grain',86,1.6,0.1,20.1,{piece:150,base:200,lo:120,hi:350}],
+['Хлеб цельнозерновой','grain',247,13,3.4,41,{bf:1,piece:30,base:60,lo:30,hi:120}],
+['Хлеб ржаной','grain',214,6.6,1.2,40.9,{bf:1,piece:30,base:60,lo:30,hi:120}],
+['Огурцы','veg',15,0.8,0.1,2.8],
+['Помидоры','veg',20,1.1,0.2,3.7],
+['Брокколи','veg',34,2.8,0.4,6.6],
+['Цветная капуста','veg',30,2.5,0.3,5.4],
+['Капуста белокочанная','veg',27,1.8,0.1,4.7],
+['Морковь','veg',32,1.3,0.1,6.9],
+['Перец болгарский','veg',27,1.3,0.1,5.3],
+['Кабачок','veg',24,0.6,0.3,4.6],
+['Баклажан','veg',24,1.2,0.1,4.5],
+['Свёкла','veg',43,1.5,0.1,8.8],
+['Шпинат','veg',23,2.9,0.3,2],
+['Салат листовой','veg',12,1.2,0.3,1.3],
+['Шампиньоны','veg',27,4.3,1,0.1],
+['Фасоль стручковая','veg',31,1.8,0.2,3.6],
+['Тыква','veg',26,1,0.1,5.9],
+['Яблоко','fruit',47,0.4,0.4,9.8,{piece:150}],
+['Банан','fruit',89,1.1,0.3,22.8,{piece:110}],
+['Апельсин','fruit',43,0.9,0.1,9,{piece:150}],
+['Груша','fruit',42,0.4,0.3,10.9,{piece:150}],
+['Мандарин','fruit',38,0.8,0.2,8.1,{piece:80}],
+['Киви','fruit',48,1,0.6,10.3,{piece:75}],
+['Персик','fruit',45,0.9,0.1,11.3,{piece:120}],
+['Клубника','fruit',33,0.7,0.3,7.7],
+['Черника','fruit',44,1.1,0.6,7.6],
+['Виноград','fruit',65,0.6,0.2,16.8],
+['Миндаль','nut',609,18.6,53.7,13],
+['Грецкий орех','nut',654,15.2,65.2,7],
+['Фундук','nut',628,15,61.2,9.4],
+['Арахис','nut',552,26,45,10],
+['Оливковое масло','oil',898,0,99.8,0],
+['Подсолнечное масло','oil',899,0,99.9,0],
+['Мёд','other',329,0.8,0,81.5]
+];
+const EXAMPLE=['Куриная грудка','Лосось','Яйцо куриное','Творог 5%','Кефир 1%','Гречка','Овсяные хлопья','Рис белый','Картофель','Огурцы','Помидоры','Брокколи','Яблоко','Банан','Миндаль','Оливковое масло'];
+const POPULAR=['Куриная грудка','Яйцо куриное','Гречка','Рис белый','Овсяные хлопья','Творог 5%','Кефир 1%','Огурцы','Помидоры','Брокколи','Яблоко','Банан','Оливковое масло','Лосось','Картофель'];
+
+function uid(){return 'p'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);}
+function findDB(name){const v=String(name||'').trim().toLowerCase();return DB.find(r=>r[0].toLowerCase()===v)||null;}
+function fromRow(r){const p={id:uid(),name:r[0],cat:r[1],kcal:r[2],pr:r[3],fa:r[4],ca:r[5]};if(r[6])Object.assign(p,r[6]);return p;}
+function defaults(){
+  return {v:1,profile:{sex:'f',age:30,height:165,weight:62,activity:1.375,goal:'keep'},meals:4,seed:7,example:true,pEdited:false,
+    pantry:EXAMPLE.map(n=>fromRow(findDB(n)))};
+}
+function cleanProduct(o){
+  if(!o||typeof o!=='object')return null;
+  const name=String(o.name||'').trim().slice(0,60);if(!name)return null;
+  const n=(v,max)=>{v=Number(v);return Number.isFinite(v)&&v>=0?Math.min(v,max):0;};
+  const p={id:String(o.id||uid()).replace(/[^\w-]/g,'').slice(0,24)||uid(),name,cat:CAT_LABEL[o.cat]?o.cat:'other',kcal:n(o.kcal,950),pr:n(o.pr,100),fa:n(o.fa,100),ca:n(o.ca,100)};
+  ['piece','base','lo','hi'].forEach(k=>{const v=Number(o[k]);if(v>0)p[k]=Math.min(v,1000);});
+  if(o.bf!==undefined)p.bf=!!o.bf;
+  return p;
+}
+function sanitizeState(s){
+  if(!s||typeof s!=='object')return null;
+  const d=defaults(),pr=s.profile||{};
+  const num=v=>{if(v===null||v===undefined||v==='')return null;v=Number(v);return Number.isFinite(v)?v:null;};
+  const profile={sex:pr.sex==='m'?'m':'f',age:num(pr.age),height:num(pr.height),weight:num(pr.weight),
+    activity:[1.2,1.375,1.55,1.725].includes(Number(pr.activity))?Number(pr.activity):1.375,
+    goal:['lose','keep','gain'].includes(pr.goal)?pr.goal:'keep'};
+  const seen=new Set();
+  const pantry=Array.isArray(s.pantry)?s.pantry.slice(0,300).map(cleanProduct).filter(p=>{if(!p||seen.has(p.id))return false;seen.add(p.id);return true;}):d.pantry;
+  return {v:1,profile,meals:Number(s.meals)===3?3:4,seed:Number.isFinite(Number(s.seed))?Number(s.seed)|0:7,example:!!s.example,pEdited:!!s.pEdited,pantry};
+}
+
+function calcNorm(pf){
+  const sex=pf.sex,age=pf.age,height=pf.height,weight=pf.weight,activity=pf.activity;
+  if(![age,height,weight].every(Number.isFinite))return null;
+  if(age<18||age>90||height<120||height>230||weight<30||weight>250)return null;
+  const bmr=10*weight+6.25*height-5*age+(sex==='m'?5:-161);
+  const tdee=bmr*activity;
+  const bmi=weight/Math.pow(height/100,2);
+  let goal=pf.goal;const notes=[];
+  if(goal==='lose'&&bmi<18.5){goal='keep';notes.push('При вашем индексе массы тела снижать вес не рекомендуется, поэтому норма рассчитана для поддержания веса.');}
+  let target=goal==='lose'?tdee*0.85:goal==='gain'?tdee*1.10:tdee;
+  if(goal==='lose')notes.push('Дефицит около 15 процентов: умеренный темп снижения веса.');
+  if(goal==='gain')notes.push('Профицит около 10 процентов: плавный набор.');
+  const floor=sex==='m'?1500:1200;
+  if(goal==='lose'&&target<floor){target=floor;notes.push('Норма не опускается ниже '+floor+' ккал: меньше без наблюдения врача не рекомендуется.');}
+  target=Math.round(target/10)*10;
+  const prot=Math.min(weight*(goal==='keep'?1.4:1.6),0.30*target/4);
+  const fat=0.28*target/9;
+  const carb=Math.max(0,(target-prot*4-fat*9)/4);
+  const label=bmi<18.5?'ниже нормы':bmi<25?'в норме':bmi<30?'выше нормы':'ожирение';
+  return {bmr:Math.round(bmr),tdee:Math.round(tdee),bmi,bmiLabel:label,target,prot:Math.round(prot),fat:Math.round(fat),carb:Math.round(carb),notes};
+}
+
+function rng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function fit(items,target){
+  const K=x=>x.g*x.p.kcal/100;
+  for(let i=0;i<14;i++){
+    const cur=items.reduce((s,x)=>s+K(x),0),diff=target-cur;
+    if(Math.abs(diff)<=target*0.012)break;
+    const adj=items.filter(x=>diff>0?x.g<x.hi-0.01:x.g>x.lo+0.01);
+    const base=adj.reduce((s,x)=>s+K(x),0);
+    if(!adj.length||base<=0)break;
+    const f=Math.max(0.3,1+diff/base);
+    adj.forEach(x=>{const ff=x.damp?1+(f-1)*x.damp:f;x.g=Math.min(x.hi,Math.max(x.lo,x.g*ff));});
+  }
+}
+function finalize(items){
+  return items.map(x=>{
+    const p=x.p;let g=x.g;
+    if(p.cat==='egg'&&p.piece)g=Math.max(1,Math.round(g/p.piece))*p.piece;else g=Math.max(5,Math.round(g/5)*5);
+    return {p,g,kcal:g*p.kcal/100,pr:g*p.pr/100,fa:g*p.fa/100,ca:g*p.ca/100};
+  });
+}
+function sum(list){return list.reduce((s,x)=>({kcal:s.kcal+x.kcal,pr:s.pr+x.pr,fa:s.fa+x.fa,ca:s.ca+x.ca}),{kcal:0,pr:0,fa:0,ca:0});}
+
+function buildMenu(pantry,target,mealsCount,seed){
+  const R=rng((seed|0)*7919+101),used={};
+  const of=(...c)=>pantry.filter(p=>c.includes(p.cat));
+  const isBread=p=>/хлеб|тост|лаваш/i.test(p.name);
+  const isCurd=p=>/творог|рикотта/i.test(p.name);
+  const isCheese=p=>/сыр/i.test(p.name);
+  const isMilkish=p=>p.cat==='dairy'&&!isCheese(p)&&!isCurd(p);
+  const isBf=p=>p.bf!==undefined?!!p.bf:(/хлоп|овсян|гречк|пшен|рис|хлеб|мюсли|киноа|кукуруз|ячнев|манн/i.test(p.name)&&!/макарон|паста|картоф|батат|спагет|лапш/i.test(p.name));
+  const isSide=p=>!/хлопья|овсян|мюсли/i.test(p.name);
+  const pick=list=>{
+    if(!list.length)return null;
+    let best=null,bs=-9;
+    for(const p of list){const s=R()-0.7*(used[p.id]||0);if(s>bs){bs=s;best=p;}}
+    used[best.id]=(used[best.id]||0)+1;return best;
+  };
+  const lim=(p,o)=>{
+    const d=PORTION[p.cat],x=Object.assign({base:p.base||d.base,lo:p.lo||d.lo,hi:p.hi||d.hi},o||{});
+    return {p,g:x.base,lo:x.lo,hi:x.hi,damp:(p.cat==='veg'||p.cat==='oil'||p.cat==='nut'||p.cat==='other')?0.5:0};
+  };
+  const veg=(it,n)=>{
+    const chosen=[];
+    for(let i=0;i<n;i++){
+      const v=pick(of('veg').filter(x=>!chosen.includes(x)));if(!v)break;
+      chosen.push(v);it.push(lim(v,{base:n>1?100:150,lo:70,hi:n>1?220:300}));
+    }
+  };
+  const oil=it=>{const o=pick(of('oil'));if(o)it.push(lim(o));};
+  const sidePool=()=>{const g=of('grain'),s=g.filter(isSide);return s.length?s:g;};
+
+  function breakfast(){
+    const it=[],main=pick(of('grain').filter(isBf));
+    if(main){
+      const bread=isBread(main);
+      it.push(lim(main,bread?{}:{base:55,lo:35,hi:110}));
+      let part=null;
+      if(bread)part=pick(of('egg').concat(of('dairy').filter(p=>isCheese(p)||isCurd(p))));
+      else{part=pick(of('dairy').filter(isMilkish));if(!part)part=pick(of('dairy').filter(isCurd));if(!part)part=pick(of('egg'));}
+      if(part)it.push(lim(part));
+    }else{
+      const e=pick(of('egg'));if(e)it.push(lim(e));
+      const d=pick(of('dairy').filter(p=>!isCheese(p)));if(d)it.push(lim(d));
+    }
+    const fr=pick(of('fruit'));if(fr)it.push(lim(fr));
+    if(R()<0.35){const n=pick(of('nut'));if(n)it.push(lim(n));}
+    if(main&&!isBread(main)&&R()<0.3){const h=pick(of('other'));if(h)it.push(lim(h));}
+    if(!it.length){const a=pick(of('dairy','fruit','nut','legume','meat','fish'));if(a)it.push(lim(a));}
+    return it;
+  }
+  function lunch(){
+    const it=[];
+    let pr=pick(of('meat','fish'));
+    if(!pr)pr=pick(of('legume','egg').concat(of('dairy').filter(isCurd)));
+    if(pr)it.push(lim(pr));
+    const pool=sidePool();
+    if(pool.length&&!(pr&&pr.cat==='legume'&&R()<0.5)){const s=pick(pool);if(s)it.push(lim(s));}
+    veg(it,R()<0.6?2:1);oil(it);
+    if(!it.length){const a=pick(pantry);if(a)it.push(lim(a));}
+    return it;
+  }
+  function dinner(share){
+    const it=[];
+    const pr=pick(of('fish','egg','meat','legume').concat(of('dairy').filter(isCurd)));
+    if(pr)it.push(lim(pr));
+    veg(it,R()<0.5?2:1);
+    const pool=sidePool();
+    if(pool.length&&share*target>=480){const s=pick(pool);if(s)it.push(lim(s));}
+    oil(it);
+    if(!it.length){const a=pick(pantry);if(a)it.push(lim(a));}
+    return it;
+  }
+  function snack(){
+    const it=[];
+    const fr=pick(of('fruit'));if(fr)it.push(lim(fr));
+    const pa=pick(of('dairy').filter(p=>isMilkish(p)||isCurd(p)).concat(of('nut')));
+    if(pa)it.push(lim(pa));
+    if(!it.length){const a=pick(of('other','dairy','veg'));if(a)it.push(lim(a));}
+    return it;
+  }
+  const plans=mealsCount===3
+    ?[['breakfast',0.30,breakfast],['lunch',0.40,lunch],['dinner',0.30,dinner]]
+    :[['breakfast',0.25,breakfast],['lunch',0.35,lunch],['snack',0.10,snack],['dinner',0.30,dinner]];
+  const built=plans.map(([key,share,fn])=>({key,share,items:fn(share)})).filter(m=>m.items.length);
+  if(!built.length)return {meals:[],total:{kcal:0,pr:0,fa:0,ca:0},empty:true};
+  const shareSum=built.reduce((s,m)=>s+m.share,0);
+  built.forEach(m=>fit(m.items,target*m.share/shareSum));
+  const flat=[].concat(...built.map(m=>m.items));
+  const cur=flat.reduce((s,x)=>s+x.g*x.p.kcal/100,0);
+  if(Math.abs(cur-target)>0.03*target)fit(flat,target);
+  const meals=built.map(m=>{const items=finalize(m.items);return Object.assign({key:m.key,share:m.share,items},sum(items));});
+  return {meals,total:sum(meals),empty:false};
+}
+</script>
+
+<script id="ui">
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY='cafe-equilibre-v1';
+const fmt0=n=>Math.round(n).toLocaleString('ru-RU');
+const fmt1=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:1});
+const MEALS={breakfast:{fr:'Petit déjeuner',ru:'Завтрак'},lunch:{fr:'Déjeuner',ru:'Обед'},snack:{fr:'Goûter',ru:'Перекус'},dinner:{fr:'Dîner',ru:'Ужин'}};
+const TIMES={4:{breakfast:'8:00',lunch:'13:00',snack:'16:30',dinner:'19:30'},3:{breakfast:'8:00',lunch:'13:30',dinner:'19:00'}};
+
+let state=defaults(),norm=null,dirty=false,docRef=null,pending=null,clearArmed=false,clearTimer=null;
+
+function persistLocal(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function loadLocal(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
+
+let saveTimer=null,saving=false,again=false;
+function scheduleSave(){dirty=true;persistLocal();clearTimeout(saveTimer);saveTimer=setTimeout(flush,600);}
+async function flush(){
+  if(!docRef)return;
+  if(saving){again=true;return;}
+  saving=true;
+  try{await docRef.set(JSON.parse(JSON.stringify(state)));}catch(e){}
+  saving=false;
+  if(again){again=false;flush();}
+}
+
+function syncForm(){
+  const p=state.profile;
+  $(p.sex==='m'?'#sexM':'#sexF').checked=true;
+  $('#age').value=p.age??'';$('#height').value=p.height??'';$('#weight').value=p.weight??'';
+  $('#activity').value=String(p.activity);$('#goal').value=p.goal;
+  $(state.meals===3?'#meals3':'#meals4').checked=true;
+  $('#pNote').hidden=!!state.pEdited;
+  $('#exampleNote').hidden=!state.example;
+}
+function readProfile(){
+  const num=id=>{const v=parseFloat(String($(id).value).replace(',','.'));return Number.isFinite(v)?v:null;};
+  const p=state.profile;
+  p.sex=$('#sexM').checked?'m':'f';
+  p.age=num('#age');p.height=num('#height');p.weight=num('#weight');
+  p.activity=parseFloat($('#activity').value);p.goal=$('#goal').value;
+  state.meals=$('#meals3').checked?3:4;
+}
+
+function renderNorm(){
+  norm=calcNorm(state.profile);
+  const note=$('#normNote');
+  if(!norm){
+    ['#kcalBig','#mP','#mF','#mC','#fBmr','#fTdee','#fBmi'].forEach(s=>{$(s).textContent='—';});
+    note.hidden=false;note.className='note err';
+    note.textContent='Проверьте значения: возраст от 18 до 90 лет, рост от 120 до 230 см, вес от 30 до 250 кг. Калькулятор рассчитан на взрослых.';
+    return;
+  }
+  $('#kcalBig').textContent=fmt0(norm.target);
+  $('#mP').textContent=norm.prot;$('#mF').textContent=norm.fat;$('#mC').textContent=norm.carb;
+  $('#fBmr').textContent=fmt0(norm.bmr)+' ккал';
+  $('#fTdee').textContent=fmt0(norm.tdee)+' ккал';
+  $('#fBmi').textContent=fmt1(norm.bmi)+', '+norm.bmiLabel;
+  if(norm.notes.length){note.hidden=false;note.className='note';note.textContent=norm.notes.join(' ');}else note.hidden=true;
+}
+
+function renderPantry(){
+  const box=$('#pantryList');
+  if(!state.pantry.length){
+    box.innerHTML='<p class="empty">Список пуст. Добавьте продукты, которые есть дома, и меню появится само.</p>';
+  }else{
+    box.innerHTML=CATS.map(([id,label])=>{
+      const items=state.pantry.filter(p=>p.cat===id);
+      if(!items.length)return '';
+      return '<div class="group"><h3>'+esc(label)+'</h3><ul class="chips">'+items.map(p=>
+        '<li class="chip"><span class="nm">'+esc(p.name)+'</span><span class="k">'+fmt0(p.kcal)+' ккал</span>'+
+        '<button type="button" class="x" data-id="'+esc(p.id)+'" aria-label="Удалить '+esc(p.name)+'">×</button></li>').join('')+'</ul></div>';
+    }).join('');
+  }
+  $('#pantryCount').textContent=state.pantry.length?('Продуктов в списке: '+state.pantry.length):'';
+  $('#clearAll').hidden=!state.pantry.length;
+  $('#exampleNote').hidden=!state.example;
+  const have=new Set(state.pantry.map(p=>p.name.toLowerCase()));
+  const q=POPULAR.filter(n=>!have.has(n.toLowerCase())).slice(0,8);
+  $('#quickBox').hidden=!q.length;
+  $('#quick').innerHTML=q.map(n=>'<button type="button" class="chip" data-name="'+esc(n)+'">+ '+esc(n)+'</button>').join('');
+}
+
+function bar(label,val,tgt,unit){
+  const pct=tgt>0?val/tgt*100:0;
+  return '<div class="row"><div class="top"><span>'+label+'</span><span>'+fmt0(val)+' из '+fmt0(tgt)+' '+unit+'</span></div>'+
+    '<div class="bar"><i class="'+(pct>106?'over':'')+'" style="width:'+Math.min(100,pct).toFixed(0)+'%"></i></div></div>';
+}
+function pieces(p,g){
+  if(!p.piece||g<p.piece*0.5)return '';
+  const n=g/p.piece;
+  if(p.cat==='egg')return ' ('+Math.round(n)+' шт)';
+  const h=Math.round(n*2)/2;
+  return ' (≈'+String(h).replace('.',',')+' шт)';
+}
+function renderMenu(){
+  const out=$('#menuOut');
+  if(!norm){out.innerHTML='<p class="empty">Введите возраст, рост и вес, тогда появится норма и меню.</p>';return;}
+  if(!state.pantry.length){out.innerHTML='<p class="empty">Список продуктов пуст. Добавьте то, что есть дома.</p>';return;}
+  const m=buildMenu(state.pantry,norm.target,state.meals,state.seed);
+  if(m.empty){out.innerHTML='<p class="empty">Из этих продуктов не получается собрать приём пищи. Добавьте мясо, рыбу, крупы или овощи.</p>';return;}
+  const times=TIMES[state.meals];
+  const cards=m.meals.map(ml=>
+    '<article class="meal"><div class="meal-head"><div><p class="eyebrow">'+MEALS[ml.key].fr+'</p><h3>'+MEALS[ml.key].ru+'</h3><p class="when">около '+times[ml.key]+'</p></div>'+
+    '<p class="mk">'+fmt0(ml.kcal)+'<small>ккал</small></p></div><ul class="dishes">'+
+    ml.items.map(x=>'<li><span class="nm">'+esc(x.p.name)+'</span><span class="dots"></span><span class="gr">'+x.g+' г'+pieces(x.p,x.g)+'</span><span class="kc">'+fmt0(x.kcal)+' ккал</span></li>').join('')+
+    '</ul></article>').join('');
+  const t=m.total,dev=(t.kcal-norm.target)/norm.target,diff=Math.round(t.kcal-norm.target);
+  let verdict;
+  if(Math.abs(dev)<=0.06)verdict='Меню укладывается в вашу норму.';
+  else if(dev<0)verdict='До нормы не хватает около '+fmt0(Math.abs(diff))+' ккал. Добавьте крупы, мясо, рыбу или масло, и меню пересоберётся.';
+  else verdict='Выше нормы примерно на '+fmt0(diff)+' ккал. Для этого набора продуктов порции уже минимальные.';
+  const notes=[];
+  const has=(...c)=>state.pantry.some(p=>c.includes(p.cat));
+  if(!has('meat','fish','egg','legume','dairy'))notes.push('Нет источников белка: добавьте мясо, рыбу, яйца или творог.');
+  else if(t.pr<norm.prot*0.8)notes.push('Белка получилось меньше нормы. Добавьте мясо, рыбу, яйца или творог.');
+  if(!has('veg'))notes.push('В списке нет овощей. Добавьте, например, огурцы или брокколи.');
+  if(!has('grain'))notes.push('В списке нет круп и гарниров, калории набрать сложнее.');
+  out.innerHTML='<div class="menu-grid">'+cards+'</div>'+
+    '<section class="addition" aria-label="Итого за день"><p class="eyebrow">L\'addition</p><h3>Итого за день</h3><div class="rows">'+
+    bar('Калории',t.kcal,norm.target,'ккал')+bar('Белки',t.pr,norm.prot,'г')+bar('Жиры',t.fa,norm.fat,'г')+bar('Углеводы',t.ca,norm.carb,'г')+
+    '</div><p class="verdict">'+verdict+'</p>'+(notes.length?'<ul class="notes">'+notes.map(n=>'<li>'+esc(n)+'</li>').join('')+'</ul>':'')+'</section>';
+}
+
+function renderAll(){renderNorm();renderPantry();renderMenu();}
+function touchPantry(){state.example=false;renderPantry();renderMenu();scheduleSave();}
+
+function say(msg,err){const s=$('#addStatus');s.textContent=msg;s.className='note status'+(err?' err':'');}
+function addRow(row){
+  state.pantry.push(fromRow(row));
+}
+
+/* init DOM */
+$('#catalog').innerHTML=DB.map(r=>'<option value="'+esc(r[0])+'"></option>').join('');
+$('#pCat').innerHTML=CATS.map(c=>'<option value="'+c[0]+'">'+esc(c[1])+'</option>').join('');
+
+$('#profileForm').addEventListener('submit',e=>e.preventDefault());
+$('#profileForm').addEventListener('input',()=>{
+  readProfile();state.pEdited=true;$('#pNote').hidden=true;
+  renderNorm();renderMenu();scheduleSave();
+});
+
+$('#pName').addEventListener('input',()=>{
+  const row=findDB($('#pName').value);
+  pending=row||null;
+  if(row){
+    $('#pCat').value=row[1];$('#pKcal').value=row[2];$('#pP').value=row[3];$('#pF').value=row[4];$('#pC').value=row[5];
+    say('Значения из каталога на 100 г. Их можно изменить.',false);
+  }
+});
+$('#addForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=$('#pName').value.trim().replace(/\s+/g,' ');
+  if(!name){say('Введите название продукта.',true);return;}
+  if(state.pantry.some(p=>p.name.toLowerCase()===name.toLowerCase())){say('Такой продукт уже в списке.',true);return;}
+  const n=id=>{const t=$(id).value.trim().replace(',','.');if(t==='')return null;const v=Number(t);return Number.isFinite(v)&&v>=0?v:NaN;};
+  let kcal=n('#pKcal'),pr=n('#pP'),fa=n('#pF'),ca=n('#pC');
+  if([kcal,pr,fa,ca].some(Number.isNaN)){say('Проверьте числа: они не могут быть отрицательными.',true);return;}
+  if(kcal===null&&pr===null&&fa===null&&ca===null){say('Укажите калорийность на 100 г или белки, жиры и углеводы.',true);return;}
+  pr=pr||0;fa=fa||0;ca=ca||0;
+  if(kcal===null)kcal=Math.round(4*pr+9*fa+4*ca);
+  if(kcal>950||pr>100||fa>100||ca>100){say('Значения даны на 100 г продукта: калорийность до 950, белки, жиры и углеводы до 100 г.',true);return;}
+  const prod=cleanProduct({name,cat:$('#pCat').value,kcal,pr,fa,ca});
+  const row=findDB(name);
+  if(row&&row[6])Object.assign(prod,cleanProduct(Object.assign({name,cat:prod.cat,kcal,pr,fa,ca},row[6])));
+  prod.id=uid();
+  state.pantry.push(prod);
+  ['#pName','#pKcal','#pP','#pF','#pC'].forEach(s=>{$(s).value='';});
+  pending=null;
+  say('Добавлено: '+name,false);
+  touchPantry();
+  $('#pName').focus();
+});
+$('#pantryList').addEventListener('click',e=>{
+  const b=e.target.closest('.x');if(!b)return;
+  const id=b.getAttribute('data-id'),p=state.pantry.find(x=>x.id===id);
+  state.pantry=state.pantry.filter(x=>x.id!==id);
+  if(p)say('Удалено: '+p.name,false);
+  touchPantry();
+});
+$('#quick').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-name]');if(!b)return;
+  const row=findDB(b.getAttribute('data-name'));
+  if(row&&!state.pantry.some(p=>p.name===row[0])){addRow(row);say('Добавлено: '+row[0],false);touchPantry();}
+});
+$('#clearAll').addEventListener('click',()=>{
+  const btn=$('#clearAll');
+  if(!clearArmed){
+    clearArmed=true;btn.textContent='Да, удалить всё';btn.classList.add('warn');
+    clearTimer=setTimeout(()=>{clearArmed=false;btn.textContent='Очистить список';btn.classList.remove('warn');},4000);
+    return;
+  }
+  clearTimeout(clearTimer);clearArmed=false;btn.textContent='Очистить список';btn.classList.remove('warn');
+  state.pantry=[];say('Список очищен.',false);touchPantry();
+});
+$('#reshuffle').addEventListener('click',()=>{state.seed=(state.seed|0)+1;renderMenu();scheduleSave();});
+
+/* start: local copy first, then the private cloud copy when available */
+(function(){const loc=sanitizeState(loadLocal());if(loc)state=loc;})();
+syncForm();renderAll();
+
+(async function initCloud(){
+  try{
+    if(!window.claude||!window.claude.use)return;
+    const res=await Promise.all([window.claude.use('db'),window.claude.use('user')]);
+    const dbNs=res[0],userNs=res[1];
+    if(!dbNs||!userNs)return;
+    const id=await userNs.id();
+    if(!id)return;
+    const ref=dbNs.doc('data/users/'+id+'/state');
+    const snap=await ref.get();
+    if(snap.exists&&!dirty){
+      const s=sanitizeState(snap.data());
+      if(s){state=s;persistLocal();syncForm();renderAll();}
+    }
+    docRef=ref;
+    if(dirty)flush();
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
